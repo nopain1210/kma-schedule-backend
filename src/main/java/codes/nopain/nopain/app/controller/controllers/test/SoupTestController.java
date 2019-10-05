@@ -74,21 +74,15 @@ public class SoupTestController {
     }
 
     @GetMapping("/api/schedule/excel")
-    public String getExcel(Principal principal, HttpServletResponse response) throws IOException, GeneralSecurityException {
+    public void getExcel(Principal principal, HttpServletResponse response) throws IOException, GeneralSecurityException {
 
-        try {
-            ExcelGenerator generator = new ExcelGenerator();
-            UserSchedule schedule = schedulesRepository.findByEmail(principal.getName())
-                    .orElseThrow(NoContentException::new);
-            generator.generate(schedule.getSpreadsheet(), response.getOutputStream());
-        } catch (Exception ex) {
-            return ex.toString();
-        }
+        ExcelGenerator generator = new ExcelGenerator();
+        UserSchedule schedule = schedulesRepository.findByEmail(principal.getName())
+                .orElseThrow(NoContentException::new);
+        generator.generate(schedule.getSpreadsheet(), response.getOutputStream());
 
-        /*response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
         response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=schedule.xlsx");
-        response.flushBuffer();*/
-
-        return "hihi";
+        response.flushBuffer();
     }
 }
