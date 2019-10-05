@@ -34,7 +34,7 @@ public class NopainApplication {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
         // *** URL below needs to match the Vue client URL and port ***
-        config.setAllowedOrigins(Collections.singletonList("http://localhost:8080"));
+//        config.setAllowedOrigins(Collections.singletonList("http://localhost:8080"));
         config.setAllowedOrigins(Collections.singletonList("https://ks.nopain.codes"));
         config.setAllowedMethods(Collections.singletonList("*"));
         config.setAllowedHeaders(Collections.singletonList("*"));

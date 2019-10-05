@@ -1,20 +1,29 @@
 package codes.nopain.nopain.app.controller.controllers.test;
 
+import codes.nopain.nopain.app.controller.exception.NoContentException;
 import codes.nopain.nopain.app.database.document.ClassSchedule;
+import codes.nopain.nopain.app.database.document.UserSchedule;
 import codes.nopain.nopain.app.database.pojo.setting.KmaAccount;
 import codes.nopain.nopain.app.database.repository.ClassesRepository;
 import codes.nopain.nopain.app.database.repository.UserSchedulesRepository;
 import codes.nopain.nopain.app.config.ScheduleProperties;
 import codes.nopain.nopain.app.worker.crawl.exception.SoupException;
+import codes.nopain.nopain.app.worker.schedule.excel.ExcelGenerator;
 import codes.nopain.nopain.app.worker.schedule.spreadsheet.builder.SpreadsheetBuilder;
 import codes.nopain.nopain.app.worker.schedule.spreadsheet.entity.Spreadsheet;
 import codes.nopain.nopain.app.worker.schedule.classes.ClassListBuilder;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.*;
+import java.security.GeneralSecurityException;
 import java.security.Principal;
 import java.util.List;
 import java.util.Objects;
@@ -61,5 +70,23 @@ public class SoupTestController {
             classListBuilder.close();
         }
 
+    }
+
+    @GetMapping("/api/schedule/excel")
+    public ResponseEntity<ByteArrayResource> getExcel(Principal principal) throws IOException, GeneralSecurityException {
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        ExcelGenerator generator = new ExcelGenerator();
+        UserSchedule schedule = schedulesRepository.findByEmail(principal.getName())
+                .orElseThrow(NoContentException::new);
+        generator.generate(schedule.getSpreadsheet(), outputStream);
+        ByteArrayResource resource = new ByteArrayResource(outputStream.toByteArray());
+        HttpHeaders headers = new HttpHeaders(); headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=schedule.xlsx");
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .contentLength(outputStream.size())
+                .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+                .body(resource);
     }
 }
