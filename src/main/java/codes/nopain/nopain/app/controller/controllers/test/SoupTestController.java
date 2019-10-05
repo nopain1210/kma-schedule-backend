@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.security.GeneralSecurityException;
 import java.security.Principal;
@@ -73,20 +74,15 @@ public class SoupTestController {
     }
 
     @GetMapping("/api/schedule/excel")
-    public ResponseEntity<ByteArrayResource> getExcel(Principal principal) throws IOException, GeneralSecurityException {
+    public void getExcel(Principal principal, HttpServletResponse response) throws IOException, GeneralSecurityException {
 
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         ExcelGenerator generator = new ExcelGenerator();
         UserSchedule schedule = schedulesRepository.findByEmail(principal.getName())
                 .orElseThrow(NoContentException::new);
-        generator.generate(schedule.getSpreadsheet(), outputStream);
-        ByteArrayResource resource = new ByteArrayResource(outputStream.toByteArray());
-        HttpHeaders headers = new HttpHeaders(); headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=schedule.xlsx");
+        generator.generate(schedule.getSpreadsheet(), response.getOutputStream());
 
-        return ResponseEntity.ok()
-                .headers(headers)
-                .contentLength(outputStream.size())
-                .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
-                .body(resource);
+        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=schedule.xlsx");
+        response.flushBuffer();
     }
 }
