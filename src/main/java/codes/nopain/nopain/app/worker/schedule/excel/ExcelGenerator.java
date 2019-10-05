@@ -23,7 +23,7 @@ public class ExcelGenerator {
         List<ClassTerm> sheets = spreadsheet.getSheets();
         ClassPathResource classPathResource = new ClassPathResource("excel/Template.xlsx");
         File template = classPathResource.getFile();
-        XSSFWorkbook workbook = new XSSFWorkbook(new FileInputStream(template));
+        XSSFWorkbook workbook = new XSSFWorkbook(classPathResource.getInputStream());
         XSSFCreationHelper factory = workbook.getCreationHelper();
         DateTimeFormatter dtf;
 
