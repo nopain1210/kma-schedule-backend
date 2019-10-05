@@ -21,7 +21,7 @@ import java.util.Objects;
 public class ExcelGenerator {
     public void generate(Spreadsheet spreadsheet, OutputStream outputStream) throws IOException {
         List<ClassTerm> sheets = spreadsheet.getSheets();
-        ClassPathResource classPathResource = new ClassPathResource("excel/Template.xlsx", this.getClass().getClassLoader());
+        ClassPathResource classPathResource = new ClassPathResource("excel/Template.xlsx");
         File template = classPathResource.getFile();
         XSSFWorkbook workbook = new XSSFWorkbook(new FileInputStream(template));
         XSSFCreationHelper factory = workbook.getCreationHelper();
