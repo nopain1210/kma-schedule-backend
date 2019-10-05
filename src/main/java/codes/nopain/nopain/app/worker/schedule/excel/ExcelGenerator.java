@@ -9,6 +9,9 @@ import codes.nopain.nopain.app.worker.global.enums.Weekday;
 import codes.nopain.nopain.app.worker.schedule.spreadsheet.entity.Spreadsheet;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.*;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 
 import java.io.*;
 import java.time.format.DateTimeFormatter;
@@ -18,7 +21,8 @@ import java.util.Objects;
 public class ExcelGenerator {
     public void generate(Spreadsheet spreadsheet, OutputStream outputStream) throws IOException {
         List<ClassTerm> sheets = spreadsheet.getSheets();
-        File template = new File(Objects.requireNonNull(getClass().getClassLoader().getResource("Template.xlsx")).getFile());
+        ClassPathResource classPathResource = new ClassPathResource("excel/Template.xlsx", this.getClass().getClassLoader());
+        File template = classPathResource.getFile();
         XSSFWorkbook workbook = new XSSFWorkbook(new FileInputStream(template));
         XSSFCreationHelper factory = workbook.getCreationHelper();
         DateTimeFormatter dtf;
